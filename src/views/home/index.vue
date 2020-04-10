@@ -161,10 +161,15 @@
     import Vue from 'vue'
     import {Component} from 'vue-property-decorator'
     import config from "../../config";
+    import {encryption} from '../../common/util/utils.js'
+    import {Mutation, Getter} from 'vuex-class'
 
     @Component({})
     export default class Home extends Vue {
         name: string = 'Home';
+        @Mutation setAccessToken;
+        @Mutation setLoadingFlag;
+        @Getter('getRandomStr') randomStr;
         dataArea = {
             /*'renYuan': 88,
             'ziYuan': 88,
@@ -204,6 +209,7 @@
         treeMapChart = null;
 
         async mounted() {
+            await this.loginSubmit();
             setTimeout(() => {
                 this.getData();
                 window.addEventListener('resize', () => {
@@ -335,6 +341,70 @@
             };
             this.treeMapChart.setOption(options);
         }
+
+
+        // 登录
+        async loginSubmit(): Promise<void> {
+            // 通过sso 平台获取用户
+            let ssoUrl = 'http://172.20.115.252:8099/sso/user/info/user/info';
+            /*await*/ this.$http({
+                method: 'post',
+                url: ssoUrl,
+                headers: {
+                    Authorization: {
+                        token: sessionStorage.getItem('ssoToken')
+                    }
+                }
+            }).then(response => {
+                if (response.data.code !== 200) {
+                    this.$message.error('登录失败,请重新登录');
+                    location.href = "http://172.20.115.241:9528/#/login?clientId=metadata";
+                    return;
+                } else {
+                    /*
+                        {
+                            "code":200,
+                            "data":"{"account":"admin","email":"admin@admin.com","enabled":true,"firstname":"admin","id":1,"lastname":"admin","password":"$2a$10$GGBqtF3dnVFzQs3hzr.zZuf6/nhV45Pjot6mFNah/uf8PT.wDYV6a","username":"admin"}",
+                            "status":"SUCCESS"
+                        }
+                    */
+                    const {account, email, enabled, firstname, id, lastname, password, username} = JSON.parse(response.data.data);
+                    console.log(account, email, enabled, firstname, id, lastname, password, username);
+                }
+            });
+            setTimeout(()=>{this.setLoadingFlag(false);},1);
+
+            let {username, password, code} = encryption({
+                data: {
+                    username: 'admin',
+                    password: '123456',
+                    code: ''
+                },
+                key: 'thanks,pig4cloud',
+                param: ['password']
+            });
+            let url = '/auth/oauth/token';
+            const grant_type = 'password';
+            const scope: string = 'server';
+            await this.$http({
+                method: 'POST',
+                url,
+                headers: {
+                    isToken: false,
+                    'Authorization': 'Basic cGlnOnBpZw=='
+                },
+                params: {username, password, code, grant_type, scope, randomStr: this.randomStr}
+            }).then(response => {
+                const {access_token} = response.data;
+                this.setAccessToken(access_token);
+                sessionStorage.setItem('access_token', access_token);
+                sessionStorage.setItem('username', 'admin');
+                sessionStorage.setItem('usernamecn', "系统管理员");
+                this['$router'].push({path: '/home'})
+            })
+        }
+
+
     }
 </script>
 
@@ -534,7 +604,7 @@
             }
 
             &.standard-content {
-                li{
+                li {
                     margin-bottom: 10px;
                 }
             }

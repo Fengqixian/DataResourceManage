@@ -377,7 +377,43 @@ class BusinessViewRelation {
                     .attr('from', '0')
                     .attr('to', '-10')
                     .attr('dur', '2s')
-                    .attr('repeatCount', 'indefinite')
+                    .attr('repeatCount', 'indefinite');
+
+
+
+
+
+                // 添加线的背景 方便点击
+               let linkTransparent = linkContainer.append('path')
+                    .attr('stroke', 'transparent')
+                    .attr('stroke-width', 5)
+                    .attr('fill', 'transparent')
+                    .attr('d', linePath([fromPort, toPort]));
+                if (this._linkClick) {
+                    linkTransparent.attr('cursor', 'pointer')
+                        .on('click', () => {
+                            this._linkClick && this._linkClick(link)
+                        })
+                        .on('mouseenter', function () {
+                            linkLine.attr('stroke', 'red')
+                                .attr('marker-start', `url(#activeEndCircle${_this._uuid})`)
+                                .attr('marker-end', `url(#activeArrow${_this._uuid})`);
+                            linkLine.selectAll('animate').remove();
+                        })
+                        .on('mouseleave', function () {
+                            linkLine.attr('stroke', '#559EF2')
+                                .attr('marker-end', `url(#arrow${_this._uuid})`)
+                                .attr('marker-start', `url(#endCircle${_this._uuid})`);
+                            linkLine.select('animate').remove();
+                            linkLine.append('animate')
+                                .attr('attributeType', 'XML')
+                                .attr('attributeName', 'stroke-dashoffset')
+                                .attr('from', '0')
+                                .attr('to', '-10')
+                                .attr('dur', '2s')
+                                .attr('repeatCount', 'indefinite')
+                        })
+                }
             }
         })
     }

@@ -240,6 +240,7 @@
                 val.forEach(item => {
                     this.defaultExpandedKeys.push(item.nodeKey);
                 })
+                console.log(this.defaultExpandedKeys);
             }
         },
 

@@ -41,7 +41,7 @@ module.exports = {
                 // target: "http://192.168.6.91:9999",  // 俊涛·接口域名
                 // target: "http://192.168.0.188:9999",  // 俊涛·接口域名(华西)
                 // target: "http://192.168.6.178:9999",  // 李根·接口域名
-                target: "http://192.168.0.112:9999",  // 111·接口域名
+                target: "http://localhost:9999",  // 111·接口域名
                 changeOrigin: true,  //是否跨域
                 pathRewrite: {
                     '^/clinbrain/api': ''   // 需要rewrite重写的,

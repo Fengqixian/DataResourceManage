@@ -62,9 +62,9 @@
                     </div>
                 </div>
                 <div class="relation-wrapper" ref="relationWrapper">
-                    <relation-cb v-if="infoRelationVisible"
+                    <relation-hx v-if="infoRelationVisible"
                                  :arg="hxArg"
-                                 :linkClick="relationClick"
+                                 :linkClick="relationHxClick"
                                  :viewType="viewType"/>
                 </div>
             </div>
@@ -75,9 +75,7 @@
                    :close-on-click-modal="false"
                    style="z-index: 3000"
                    class="relation-wrapper-ETL">
-            <relation-cb v-if="infoRelationETLVisible"
-                         :arg="ETLhxArg"
-                         :detail="true"/>
+            <div ref="relationETLWrapper" class="etl-wrapper" v-if="infoRelationETLVisible"></div>
         </el-dialog>
     </div>
 </template>
@@ -86,11 +84,11 @@
     import Vue from 'vue'
     import {Component, Watch, Model, Prop} from 'vue-property-decorator'
     import config from "../../config";
-    import relationCb from "./relationCb.vue";
+    import RelationHx from "./relationHx.vue";
     import BusinessViewRelationClass from '../../common/js/BusinessViewRelationClass'
 
     @Component({
-        components: {relationCb},
+        components: {RelationHx},
     })
     export default class CbCardRelation extends Vue {
         name: string = 'CbCardRelation';
@@ -102,7 +100,6 @@
         infoRelationTableData: Array<any> = [];
 
         hxArg: object = {};
-        ETLhxArg: object = {};
 
 
         infoRelationETLVisible: boolean = false;
@@ -149,6 +146,7 @@
                     id: data.id,
                     current: 1,
                     size: 1000,
+                    version: 'HX',
                 };
                 this.$http.get(url, {params}).then(response => {
                     if (response.data.code === 0) {
@@ -167,11 +165,26 @@
         /**
          * 华西血缘线点击
          */
-        relationClick(data) {
-            if (data.type === 'ETL') {
-                this.infoRelationETLVisible = true;
-                this.ETLhxArg = data;
-            }
+        relationHxClick(link) {
+            this.infoRelationETLVisible = true;
+            let url = config.port('metaDataLineage') + '/getDataLineageETLDetail';
+            let params = {
+                resourceId: link.to.id,
+                version: 'HX',
+                nameEn: link.to.nameEn,
+                etlId:link.etlId
+            };
+            this.$http.get(url, {params}).then(response => {
+                if (response.data.code === 0) {
+                    const {linkDataArray, sourceDataArray, targetDataArray} = response.data.data;
+                    let data = {0: {children: targetDataArray}, 1: {children: sourceDataArray}};
+                    new BusinessViewRelationClass({
+                        ref: this.$refs.relationETLWrapper,
+                        data,
+                        linkData: linkDataArray
+                    });
+                }
+            });
         }
 
     }

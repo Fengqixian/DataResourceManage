@@ -83,7 +83,7 @@ config.port = function (portname: string) {
             name: "technologyEtl",// 技术ETL
             url: "/MetadataManage/technologyEtl/"
         }, {
-            name: "roleresourcepermission",// 权限
+            name: "roleresourcepermission",// 技术ETL
             url: "/MetadataManage/roleresourcepermission/"
         }
     ];

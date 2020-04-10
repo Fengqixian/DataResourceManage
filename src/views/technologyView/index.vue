@@ -194,7 +194,7 @@
         name: string = 'MetaImport'
         // 元模型tree数据
         treeData: Array<object> = []
-        defaultExpandedKeys = [];
+        defaultExpandedKeys: Array<object> = []
         defaultProps: object = {
             children: 'children',
             label: 'label'

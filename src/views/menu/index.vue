@@ -56,7 +56,7 @@
 
         created() {
             this.getMenu();
-            this.getBaseFiledOptions('status');
+            /*this.getBaseFiledOptions('status');*/
             this.isCollapse = this.menuWidth < 100 ? true : false;
         }
 

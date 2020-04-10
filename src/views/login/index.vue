@@ -1,6 +1,8 @@
 <template>
-    <div class="login">
-        <div class="login-wrapper">
+    <div class="login"
+         v-loading="true"
+         element-loading-text="拼命加载中...">
+        <div style="display: none" class="login-wrapper">
             <header class="header">
                 <img src="./images/logo.png" alt="" class="logo">
                 <span class="company">上海柯林布瑞信息技术有限公司</span>
@@ -66,7 +68,8 @@
                 {required: true, message: '请输入密码', trigger: 'change'}
             ],
         };
-        showTk: any = ''; // 参数
+
+        // showTk: any = ''; // 参数
 
 
         @Watch('randomStr')
@@ -79,6 +82,19 @@
             this.$nextTick(() => {
                 this.loginSubmit();
             })
+        }
+
+
+        mounted() {
+            // setTimeout(() => {
+            //     this.showTk = this.$route.query['tk'];
+            //     let showkeys = sessionStorage.getItem('sso_access_token');
+            //     if (!showkeys) {
+            //         sessionStorage.setItem('sso_access_token', this.showTk);
+            //     }
+            //
+            //
+            // }, 20)
         }
 
         // 登录
@@ -106,7 +122,15 @@
                         this.setAccessToken(access_token);
                         sessionStorage.setItem('access_token', access_token);
                         sessionStorage.setItem('username', this.loginForm.username);
+                        sessionStorage.setItem('usernamecn', "系统管理员");
+                        //this['$router'].push({path: '/home'})
+                        // let showkey = sessionStorage.getItem('sso_access_token');
+                        // if (showkey) {
                         this['$router'].push({path: '/home'})
+                        // } else {
+                        //     location.href = "http://172.21.32.238:6880/sso/?clienturl=http://172.21.230.131"
+                        //
+                        // }
                     })
                 } else {
                     return false;
